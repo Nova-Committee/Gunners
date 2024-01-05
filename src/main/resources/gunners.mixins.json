@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "team.dovecotmc.gunners.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "gunners.refmap.json",
+  "mixins": [
+    "common.recruit.MixinCrossBowmanEntity"
+  ],
+  "client": [
+    "client.recruit.MixinAbstractRecruitHumanRenderer",
+    "client.recruit.MixinAbstractRecruitVillagerRenderer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
