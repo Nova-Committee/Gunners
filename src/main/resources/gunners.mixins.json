@@ -4,6 +4,7 @@
   "package": "team.dovecotmc.gunners.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "gunners.refmap.json",
+  "plugin": "team.dovecotmc.gunners.mixin.plugin.GunnersMixinPlugin",
   "mixins": [
     "common.recruit.MixinCrossBowmanEntity"
   ],
