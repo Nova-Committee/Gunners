@@ -1,8 +1,10 @@
 package team.dovecotmc.gunners.mixin.client.recruit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrcrayfish.guns.item.GunItem;
 import com.talhanation.recruits.client.render.AbstractRecruitVillagerRenderer;
 import com.talhanation.recruits.entities.AbstractInventoryEntity;
+import com.talhanation.recruits.entities.CrossBowmanEntity;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -23,7 +25,7 @@ public abstract class MixinAbstractRecruitVillagerRenderer extends HumanoidMobRe
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/HumanoidMobRenderer;render(Lnet/minecraft/world/entity/Mob;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V")
     )
     private void inject$render(AbstractInventoryEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, CallbackInfo ci) {
-        //if (entityIn instanceof CrossBowmanEntity && entityIn.getMainHandItem().getItem() instanceof GunItem)
-        //    getModel().rightArmPose = HumanoidModel.ArmPose.SPYGLASS;
+        if (entityIn instanceof CrossBowmanEntity && entityIn.getMainHandItem().getItem() instanceof GunItem)
+            getModel().rightArmPose = HumanoidModel.ArmPose.BOW_AND_ARROW;
     }
 }

@@ -17,12 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.recruit.ai.RecruitCgmGunAttackGoal;
 
-@Mixin(value = CrossBowmanEntity.class, remap = false)
+@Mixin(CrossBowmanEntity.class)
 public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity implements IEntityCanReload {
     @Unique
     private int gunners$reloadTick;
 
-    @Shadow
+    @Shadow(remap = false)
     public abstract double getMeleeStartRange();
 
     public MixinCrossBowmanEntity(EntityType<? extends AbstractInventoryEntity> entityType, Level world) {
@@ -34,7 +34,7 @@ public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity imple
         this.goalSelector.addGoal(0, new RecruitCgmGunAttackGoal((CrossBowmanEntity) (Object) this, this.getMeleeStartRange()));
     }
 
-    @Inject(method = "wantsToPickUp", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "wantsToPickUp", at = @At("HEAD"), cancellable = true)
     private void inject$wantsToPickup(ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
         if (itemStack.getItem() instanceof GunItem) cir.setReturnValue(true);
     }

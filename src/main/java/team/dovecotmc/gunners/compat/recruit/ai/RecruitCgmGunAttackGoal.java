@@ -117,8 +117,7 @@ public class RecruitCgmGunAttackGoal extends Goal {
                             if (i >= this.weaponLoadTime) {
                                 getReloadable().gunners$setReloadTick(0);
                                 this.crossBowman.playSound(this.weapon.getLoadSound(), 1.0F, 1.0F / (this.crossBowman.getRandom().nextFloat() * 0.4F + 0.8F));
-                                this.weapon.setLoaded(this.crossBowman.getMainHandItem(), true);
-                                this.consumeAmmo();
+                                this.weapon.setLoaded(this.consumeAmmo());
                                 this.state = State.AIMING;
                             }
                             break;
@@ -162,8 +161,7 @@ public class RecruitCgmGunAttackGoal extends Goal {
                         if (i >= this.weaponLoadTime) {
                             getReloadable().gunners$setReloadTick(0);
                             this.crossBowman.playSound(this.weapon.getLoadSound(), 1.0F, 1.0F / (this.crossBowman.getRandom().nextFloat() * 0.4F + 0.8F));
-                            this.weapon.setLoaded(this.crossBowman.getMainHandItem(), true);
-                            this.consumeAmmo();
+                            this.weapon.setLoaded(this.consumeAmmo());
                             if (target != null && target.isAlive()) {
                                 this.state = State.AIMING;
                             } else {
@@ -191,7 +189,7 @@ public class RecruitCgmGunAttackGoal extends Goal {
                         if (target != null && target.isAlive() && this.crossBowman.canAttack(target) && this.crossBowman.getState() != 3) {
                             this.crossBowman.getLookControl().setLookAt(target);
                             this.crossBowman.level().playSound(null, this.crossBowman, weapon.getShootSound(), SoundSource.PLAYERS, 1.0F, 1.0F);
-                            this.weapon.performRangedAttackIWeapon(this.crossBowman, target.getX(), target.getEyeY(), target.getZ(), this.weapon.getProjectileSpeed());
+                            this.weapon.performRangedAttackIWeapon(this.crossBowman, target.getX(), (target.getEyeY() + target.getY()) / 2, target.getZ(), this.weapon.getProjectileSpeed());
                         }
                         this.state = State.IDLE;
                 }
@@ -200,8 +198,8 @@ public class RecruitCgmGunAttackGoal extends Goal {
 
     }
 
-    private void consumeAmmo() {
-        weapon.consumeAmmoInInv(this.crossBowman.getInventory());
+    private int consumeAmmo() {
+        return weapon.consumeAmmoInInv(this.crossBowman.getInventory());
     }
 
     private boolean canLoad() {

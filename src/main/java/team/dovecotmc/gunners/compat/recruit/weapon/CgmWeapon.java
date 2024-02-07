@@ -52,7 +52,7 @@ public class CgmWeapon implements IWeapon {
 
     @Override
     public Item getWeapon() {
-        return ModItems.PISTOL.get();
+        return gunStack.getItem();
     }
 
     @Override
@@ -67,12 +67,15 @@ public class CgmWeapon implements IWeapon {
 
     @Override
     public int getWeaponLoadTime() {
-        return gun.getGeneral().getMaxAmmo() / gun.getGeneral().getReloadAmount();
+        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun) / gun.getGeneral().getReloadAmount() * 20;
     }
 
     @Override
     public float getProjectileSpeed() {
-        return (float) gun.getProjectile().getSpeed();
+        return (float) GunModifierHelper.getModifiedProjectileSpeed(
+                gunStack,
+                gun.getProjectile().getSpeed() * GunEnchantmentHelper.getProjectileSpeedModifier(gunStack)
+        );
     }
 
     @Override
@@ -145,8 +148,13 @@ public class CgmWeapon implements IWeapon {
             ProjectileEntity projectileEntity = factory.create(level, shooter, gunStack, (GunItem) gunStack.getItem(), gun);
             projectileEntity.setWeapon(gunStack);
             projectileEntity.setAdditionalDamage(Gun.getAdditionalDamage(gunStack));
-            final Vec3 startPos = shooter.position();
-            final Vec3 track = new Vec3(x, y, z).subtract(startPos).normalize();
+            final Vec3 startPos = shooter.getEyePosition();
+            final float gunSpread = GunModifierHelper.getModifiedSpread(gunStack, gun.getGeneral().getSpread()) * .5F;
+            final Vec3 track = new Vec3(x, y, z).subtract(startPos).normalize().add(
+                    ThreadLocalRandom.current().nextFloat() * gunSpread / 100.0,
+                    ThreadLocalRandom.current().nextFloat() * gunSpread / 100.0,
+                    ThreadLocalRandom.current().nextFloat() * gunSpread / 100.0
+            );
             projectileEntity.setPos(startPos.add(track));
             projectileEntity.setDeltaMovement(track.scale(projectileSpeed));
             level.addFreshEntity(projectileEntity);
@@ -180,9 +188,13 @@ public class CgmWeapon implements IWeapon {
     @Override
     public void setLoaded(ItemStack itemStack, boolean b) {
         if (!b) return;
+        setLoaded(GunEnchantmentHelper.getAmmoCapacity(itemStack, gun));
+    }
+
+    public void setLoaded(int ammo) {
         CompoundTag tag = gunStack.getOrCreateTag();
         if (tag.getBoolean("IgnoreAmmo")) return;
-        tag.putInt("AmmoCount", GunEnchantmentHelper.getAmmoCapacity(itemStack, gun));
+        tag.putInt("AmmoCount", ammo);
     }
 
     private void consumeAmmoInGun() {
@@ -195,8 +207,8 @@ public class CgmWeapon implements IWeapon {
         }
     }
 
-    public void consumeAmmoInInv(SimpleContainer inv) {
-        inv.removeItemType(getAmmo(), 1);
+    public int consumeAmmoInInv(SimpleContainer inv) {
+        return inv.removeItemType(getAmmo(), GunEnchantmentHelper.getAmmoCapacity(gunStack, gun)).getCount();
     }
 
     public boolean hasAmmoInInv(SimpleContainer inv) {
