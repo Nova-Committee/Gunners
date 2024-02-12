@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
 import team.dovecotmc.gunners.api.IEntityCanReload;
-import team.dovecotmc.gunners.compat.recruits.weapon.CgmWeapon;
+import team.dovecotmc.gunners.compat.weapon.CgmWeapon;
 
 public abstract class CgmGunAttackGoal<T extends Mob> extends Goal {
     protected final T shooter;

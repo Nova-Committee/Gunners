@@ -1,4 +1,4 @@
-package team.dovecotmc.gunners.compat.recruits.weapon;
+package team.dovecotmc.gunners.compat.weapon;
 
 import com.mrcrayfish.framework.api.network.LevelLocation;
 import com.mrcrayfish.guns.Config;
