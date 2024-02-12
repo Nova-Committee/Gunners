@@ -1,4 +1,4 @@
-package team.dovecotmc.gunners.mixin.common.recruit;
+package team.dovecotmc.gunners.mixin.common.recruits;
 
 import com.mrcrayfish.guns.item.GunItem;
 import com.talhanation.recruits.entities.AbstractInventoryEntity;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import team.dovecotmc.gunners.api.IEntityCanReload;
-import team.dovecotmc.gunners.compat.recruit.ai.RecruitCgmGunAttackGoal;
+import team.dovecotmc.gunners.compat.recruits.ai.RecruitCgmGunAttackGoal;
 
 @Mixin(CrossBowmanEntity.class)
 public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity implements IEntityCanReload {

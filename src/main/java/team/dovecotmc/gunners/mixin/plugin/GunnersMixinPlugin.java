@@ -9,6 +9,8 @@ import java.util.Set;
 
 public class GunnersMixinPlugin implements IMixinConfigPlugin {
     private boolean cgmLoaded;
+    private boolean recruitsLoaded;
+    private boolean guardVillagersLoaded;
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -17,6 +19,18 @@ public class GunnersMixinPlugin implements IMixinConfigPlugin {
             cgmLoaded = true;
         } catch (Exception e) {
             cgmLoaded = false;
+        }
+        try {
+            Class.forName("com.talhanation.recruits.Main", false, this.getClass().getClassLoader());
+            recruitsLoaded = true;
+        } catch (Exception e) {
+            recruitsLoaded = false;
+        }
+        try {
+            Class.forName("tallestegg.guardvillagers.GuardVillagers", false, this.getClass().getClassLoader());
+            guardVillagersLoaded = true;
+        } catch (Exception e) {
+            guardVillagersLoaded = false;
         }
     }
 
@@ -27,7 +41,10 @@ public class GunnersMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return cgmLoaded;
+        if (!cgmLoaded) return false;
+        if (mixinClassName.contains("recruits")) return recruitsLoaded;
+        if (mixinClassName.contains("guardvillagers")) return guardVillagersLoaded;
+        return true;
     }
 
     @Override

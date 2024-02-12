@@ -6,11 +6,13 @@
   "refmap": "gunners.refmap.json",
   "plugin": "team.dovecotmc.gunners.mixin.plugin.GunnersMixinPlugin",
   "mixins": [
-    "common.recruit.MixinCrossBowmanEntity"
+    "common.guardvillagers.MixinGuard",
+    "common.recruits.MixinCrossBowmanEntity"
   ],
   "client": [
-    "client.recruit.MixinAbstractRecruitHumanRenderer",
-    "client.recruit.MixinAbstractRecruitVillagerRenderer"
+    "client.guardvillagers.MixinGuardRenderer",
+    "client.recruits.MixinAbstractRecruitHumanRenderer",
+    "client.recruits.MixinAbstractRecruitVillagerRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

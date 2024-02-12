@@ -1,4 +1,4 @@
-package team.dovecotmc.gunners.compat.recruit.weapon;
+package team.dovecotmc.gunners.compat.recruits.weapon;
 
 import com.mrcrayfish.framework.api.network.LevelLocation;
 import com.mrcrayfish.guns.Config;
@@ -13,22 +13,19 @@ import com.mrcrayfish.guns.network.PacketHandler;
 import com.mrcrayfish.guns.network.message.S2CMessageBulletTrail;
 import com.mrcrayfish.guns.util.GunEnchantmentHelper;
 import com.mrcrayfish.guns.util.GunModifierHelper;
-import com.talhanation.recruits.compat.IWeapon;
-import com.talhanation.recruits.entities.AbstractRecruitEntity;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
+import team.dovecotmc.gunners.api.IWeapon;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
@@ -79,26 +76,6 @@ public class CgmWeapon implements IWeapon {
     }
 
     @Override
-    public AbstractHurtingProjectile getProjectile(LivingEntity livingEntity) {
-        return null;
-    }
-
-    @Override
-    public AbstractArrow getProjectileArrow(LivingEntity livingEntity) {
-        return null;
-    }
-
-    @Override
-    public AbstractHurtingProjectile shoot(LivingEntity livingEntity, AbstractHurtingProjectile abstractHurtingProjectile, double v, double v1, double v2) {
-        return null;
-    }
-
-    @Override
-    public AbstractArrow shootArrow(LivingEntity livingEntity, AbstractArrow abstractArrow, double v, double v1, double v2) {
-        return null;
-    }
-
-    @Override
     public SoundEvent getShootSound() {
         if (fireSound == null)
             fireSound = ForgeRegistries.SOUND_EVENTS.getValue(
@@ -127,17 +104,7 @@ public class CgmWeapon implements IWeapon {
     }
 
     @Override
-    public boolean isBow() {
-        return false;
-    }
-
-    @Override
-    public boolean isCrossBow() {
-        return false;
-    }
-
-    @Override
-    public void performRangedAttackIWeapon(AbstractRecruitEntity shooter, double x, double y, double z, float projectileSpeed) {
+    public void performRangedAttackIWeapon(Mob shooter, double x, double y, double z, float projectileSpeed) {
         final Level level = shooter.level();
         if (level.isClientSide()) return;
         int count = gun.getGeneral().getProjectileAmount();
@@ -177,20 +144,11 @@ public class CgmWeapon implements IWeapon {
     }
 
     @Override
-    public boolean isLoaded(ItemStack itemStack) {
-        return Gun.hasAmmo(itemStack);
-    }
-
     public boolean isLoaded() {
-        return isLoaded(gunStack);
+        return Gun.hasAmmo(gunStack);
     }
 
     @Override
-    public void setLoaded(ItemStack itemStack, boolean b) {
-        if (!b) return;
-        setLoaded(GunEnchantmentHelper.getAmmoCapacity(itemStack, gun));
-    }
-
     public void setLoaded(int ammo) {
         CompoundTag tag = gunStack.getOrCreateTag();
         if (tag.getBoolean("IgnoreAmmo")) return;
@@ -209,6 +167,10 @@ public class CgmWeapon implements IWeapon {
 
     public int consumeAmmoInInv(SimpleContainer inv) {
         return inv.removeItemType(getAmmo(), GunEnchantmentHelper.getAmmoCapacity(gunStack, gun)).getCount();
+    }
+
+    public int consumeAmmoFromVoid() {
+        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun);
     }
 
     public boolean hasAmmoInInv(SimpleContainer inv) {
