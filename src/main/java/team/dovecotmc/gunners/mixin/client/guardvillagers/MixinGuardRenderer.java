@@ -1,7 +1,5 @@
 package team.dovecotmc.gunners.mixin.client.guardvillagers;
 
-import com.mrcrayfish.guns.init.ModItems;
-import com.mrcrayfish.guns.item.GunItem;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
@@ -13,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import tallestegg.guardvillagers.client.renderer.GuardRenderer;
 import tallestegg.guardvillagers.entities.Guard;
+import team.dovecotmc.gunners.compat.CompatHandler;
 
 @Mixin(GuardRenderer.class)
 public abstract class MixinGuardRenderer extends HumanoidMobRenderer<Guard, HumanoidModel<Guard>> {
@@ -23,7 +22,6 @@ public abstract class MixinGuardRenderer extends HumanoidMobRenderer<Guard, Huma
 
     @Inject(method = "getArmPose", at = @At("HEAD"), remap = false, cancellable = true)
     private void inject$getArmPose(Guard entityIn, ItemStack itemStackMain, ItemStack itemStackOff, InteractionHand handIn, CallbackInfoReturnable<HumanoidModel.ArmPose> cir) {
-        if (itemStackMain.getItem() instanceof GunItem)
-            cir.setReturnValue(itemStackMain.is(ModItems.MINI_GUN.get()) ? HumanoidModel.ArmPose.EMPTY : HumanoidModel.ArmPose.BOW_AND_ARROW);
+        CompatHandler.poseForAiming(itemStackMain).ifPresent(cir::setReturnValue);
     }
 }

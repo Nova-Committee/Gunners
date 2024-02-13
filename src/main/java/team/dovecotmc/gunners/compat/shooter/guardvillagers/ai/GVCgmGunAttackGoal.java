@@ -1,4 +1,4 @@
-package team.dovecotmc.gunners.compat.guardvillagers.ai;
+package team.dovecotmc.gunners.compat.shooter.guardvillagers.ai;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;

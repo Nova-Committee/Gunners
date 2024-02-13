@@ -94,16 +94,6 @@ public class CgmWeapon implements IWeapon {
     }
 
     @Override
-    public boolean isGun() {
-        return true;
-    }
-
-    @Override
-    public boolean canMelee() {
-        return false;
-    }
-
-    @Override
     public void performRangedAttackIWeapon(Mob shooter, double x, double y, double z, float projectileSpeed) {
         final Level level = shooter.level();
         if (level.isClientSide()) return;

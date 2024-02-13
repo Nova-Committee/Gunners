@@ -19,10 +19,6 @@ public interface IWeapon {
 
     SoundEvent getLoadSound();
 
-    boolean isGun();
-
-    boolean canMelee();
-
     void performRangedAttackIWeapon(Mob var1, double x, double y, double z, float projectileSpeed);
 
     boolean isLoaded();

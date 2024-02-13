@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tallestegg.guardvillagers.entities.Guard;
 import team.dovecotmc.gunners.api.IEntityCanReload;
-import team.dovecotmc.gunners.compat.guardvillagers.ai.GVCgmGunAttackGoal;
+import team.dovecotmc.gunners.compat.CompatHandler;
+import team.dovecotmc.gunners.compat.shooter.guardvillagers.ai.GVCgmGunAttackGoal;
 
 @Mixin(Guard.class)
 public abstract class MixinGuard extends PathfinderMob implements IEntityCanReload {
@@ -23,7 +24,8 @@ public abstract class MixinGuard extends PathfinderMob implements IEntityCanRelo
 
     @Inject(method = "registerGoals", at = @At("HEAD"))
     private void inject$registerGoals(CallbackInfo ci) {
-        this.goalSelector.addGoal(0, new GVCgmGunAttackGoal((Guard) (Object) this, 0.0));
+        if (CompatHandler.getInstance().cgmLoaded)
+            this.goalSelector.addGoal(0, new GVCgmGunAttackGoal((Guard) (Object) this, 0.0));
     }
 
     @Override

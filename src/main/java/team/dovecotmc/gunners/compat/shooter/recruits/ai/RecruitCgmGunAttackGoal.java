@@ -1,4 +1,4 @@
-package team.dovecotmc.gunners.compat.recruits.ai;
+package team.dovecotmc.gunners.compat.shooter.recruits.ai;
 
 import com.talhanation.recruits.entities.CrossBowmanEntity;
 import net.minecraft.core.BlockPos;
