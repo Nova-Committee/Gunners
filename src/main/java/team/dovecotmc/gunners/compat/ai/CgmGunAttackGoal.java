@@ -141,7 +141,7 @@ public abstract class CgmGunAttackGoal<T extends Mob> extends Goal {
                         if (shouldSuppress()) {
                             this.state = State.AIMING;
                         } else {
-                            this.shooter.level().playSound(null, this.shooter, weapon.getShootSound(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                            this.shooter.level.playSound(null, this.shooter, weapon.getShootSound(), SoundSource.PLAYERS, 1.0F, 1.0F);
                             this.weapon.performRangedAttackIWeapon(this.shooter, target.getX(), (target.getEyeY() + target.getY()) / 2, target.getZ(), this.weapon.getProjectileSpeed());
                             this.state = State.IDLE;
                         }

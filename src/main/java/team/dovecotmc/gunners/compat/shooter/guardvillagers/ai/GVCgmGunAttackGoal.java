@@ -28,7 +28,7 @@ public class GVCgmGunAttackGoal extends CgmGunAttackGoal<Guard> {
     }
 
     private boolean friendlyInLineOfSight() {
-        return this.shooter.level()
+        return this.shooter.level
                 .getEntities(this.shooter, this.shooter.getBoundingBox().inflate(5.0))
                 .stream().anyMatch(target -> {
                     if (target == this.shooter.getTarget()) return false;

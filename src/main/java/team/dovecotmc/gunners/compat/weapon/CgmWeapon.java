@@ -95,7 +95,7 @@ public class CgmWeapon implements IWeapon {
 
     @Override
     public void performRangedAttackIWeapon(Mob shooter, double x, double y, double z, float projectileSpeed) {
-        final Level level = shooter.level();
+        final Level level = shooter.level;
         if (level.isClientSide()) return;
         int count = gun.getGeneral().getProjectileAmount();
         Gun.Projectile projectileProps = gun.getProjectile();

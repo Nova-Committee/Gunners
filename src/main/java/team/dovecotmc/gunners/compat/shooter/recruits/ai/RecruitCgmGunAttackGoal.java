@@ -144,7 +144,7 @@ public class RecruitCgmGunAttackGoal extends CgmGunAttackGoal<CrossBowmanEntity>
                     case SHOOT:
                         if (target != null && target.isAlive() && this.shooter.canAttack(target) && this.shooter.getState() != 3) {
                             this.shooter.getLookControl().setLookAt(target);
-                            this.shooter.level().playSound(null, this.shooter, weapon.getShootSound(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                            this.shooter.level.playSound(null, this.shooter, weapon.getShootSound(), SoundSource.PLAYERS, 1.0F, 1.0F);
                             this.weapon.performRangedAttackIWeapon(this.shooter, target.getX(), (target.getEyeY() + target.getY()) / 2, target.getZ(), this.weapon.getProjectileSpeed());
                         }
                         this.state = State.IDLE;
