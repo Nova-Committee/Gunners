@@ -1,18 +1,17 @@
 package team.dovecotmc.gunners.compat.weapon;
 
-import com.mrcrayfish.guns.Config;
-import com.mrcrayfish.guns.common.Gun;
-import com.mrcrayfish.guns.common.ProjectileManager;
-import com.mrcrayfish.guns.entity.ProjectileEntity;
-import com.mrcrayfish.guns.init.ModEnchantments;
-import com.mrcrayfish.guns.init.ModItems;
-import com.mrcrayfish.guns.interfaces.IProjectileFactory;
-import com.mrcrayfish.guns.item.GunItem;
-import com.mrcrayfish.guns.network.PacketHandler;
-import com.mrcrayfish.guns.network.message.S2CMessageBulletTrail;
-import com.mrcrayfish.guns.util.GunEnchantmentHelper;
-import com.mrcrayfish.guns.util.GunModifierHelper;
-import net.minecraft.core.particles.ParticleOptions;
+import com.tac.guns.Config;
+import com.tac.guns.common.Gun;
+import com.tac.guns.common.ProjectileManager;
+import com.tac.guns.entity.ProjectileEntity;
+import com.tac.guns.init.ModEnchantments;
+import com.tac.guns.init.ModItems;
+import com.tac.guns.interfaces.IProjectileFactory;
+import com.tac.guns.item.GunItem;
+import com.tac.guns.network.PacketHandler;
+import com.tac.guns.network.message.MessageBulletTrail;
+import com.tac.guns.util.GunEnchantmentHelper;
+import com.tac.guns.util.GunModifierHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -31,20 +30,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CgmWeapon implements IWeapon {
+public class TacWeapon implements IWeapon {
     private final ItemStack gunStack;
     private SoundEvent fireSound;
     private SoundEvent loadSound;
     private Item ammo;
     private final Gun gun;
+    private int fireRate = -1;
 
-    public CgmWeapon(ItemStack stack) {
+    public TacWeapon(ItemStack stack) {
         if (stack.getItem() instanceof GunItem g) {
             this.gunStack = stack;
             this.gun = g.getModifiedGun(stack);
         } else {
-            this.gunStack = ModItems.PISTOL.get().getDefaultInstance();
-            this.gun = ModItems.PISTOL.get().getGun();
+            this.gunStack = ModItems.GLOCK_17.get().getDefaultInstance();
+            this.gun = ((GunItem) ModItems.GLOCK_17.get()).getGun();
         }
     }
 
@@ -60,12 +60,14 @@ public class CgmWeapon implements IWeapon {
 
     @Override
     public int getAttackCooldown() {
-        return GunModifierHelper.getModifiedRate(gunStack, GunEnchantmentHelper.getRate(gunStack, gun));
+        if (fireRate == -1)
+            fireRate = Math.max(1, (int) (1.0 / GunModifierHelper.getModifiedRate(gunStack, gun.getGeneral().getRate())));
+        return fireRate;
     }
 
     @Override
     public int getWeaponLoadTime() {
-        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun) / gun.getGeneral().getReloadAmount() * 20;
+        return GunModifierHelper.getAmmoCapacity(gunStack, gun) / gun.getReloads().getReloadAmount() * gun.getReloads().getReloadMagTimer();
     }
 
     @Override
@@ -80,9 +82,7 @@ public class CgmWeapon implements IWeapon {
     public SoundEvent getShootSound() {
         if (fireSound == null)
             fireSound = ForgeRegistries.SOUND_EVENTS.getValue(
-                    GunModifierHelper.isSilencedFire(gunStack) ? gun.getSounds().getSilencedFire() :
-                            gunStack.isEnchanted() ? gun.getSounds().getEnchantedFire() :
-                                    gun.getSounds().getFire()
+                    GunModifierHelper.isSilencedFire(gunStack) ? gun.getSounds().getSilencedFire() : gun.getSounds().getFire()
             );
         return fireSound;
     }
@@ -103,7 +103,7 @@ public class CgmWeapon implements IWeapon {
         ProjectileEntity[] spawnedProjectiles = new ProjectileEntity[count];
         for (int i = 0; i < count; ++i) {
             IProjectileFactory factory = ProjectileManager.getInstance().getFactory(projectileProps.getItem());
-            ProjectileEntity projectileEntity = factory.create(level, shooter, gunStack, (GunItem) gunStack.getItem(), gun);
+            ProjectileEntity projectileEntity = factory.create(level, shooter, gunStack, (GunItem) gunStack.getItem(), gun, .0F, .0F);
             projectileEntity.setWeapon(gunStack);
             projectileEntity.setAdditionalDamage(Gun.getAdditionalDamage(gunStack));
             final Vec3 startPos = shooter.getEyePosition();
@@ -125,8 +125,7 @@ public class CgmWeapon implements IWeapon {
             int y1 = (int) (shooter.getY() + 1.0);
             int z1 = (int) shooter.getZ();
             double r = Config.COMMON.network.projectileTrackingRange.get();
-            ParticleOptions data = GunEnchantmentHelper.getParticle(gunStack);
-            S2CMessageBulletTrail messageBulletTrail = new S2CMessageBulletTrail(spawnedProjectiles, projectileProps, shooter.getId(), data);
+            MessageBulletTrail messageBulletTrail = new MessageBulletTrail(spawnedProjectiles, projectileProps, shooter.getId(), projectileProps.getSize());
             PacketHandler.getPlayChannel().send(
                     PacketDistributor.NEAR.with(() -> PacketDistributor.TargetPoint.p(x1, y1, z1, r, level.dimension()).get()),
                     messageBulletTrail
@@ -157,11 +156,11 @@ public class CgmWeapon implements IWeapon {
     }
 
     public int consumeAmmoInInv(SimpleContainer inv) {
-        return inv.removeItemType(getAmmo(), GunEnchantmentHelper.getAmmoCapacity(gunStack, gun)).getCount();
+        return inv.removeItemType(getAmmo(), GunModifierHelper.getAmmoCapacity(gunStack, gun)).getCount();
     }
 
     public int consumeAmmoFromVoid() {
-        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun);
+        return GunModifierHelper.getAmmoCapacity(gunStack, gun);
     }
 
     public boolean hasAmmoInInv(SimpleContainer inv) {

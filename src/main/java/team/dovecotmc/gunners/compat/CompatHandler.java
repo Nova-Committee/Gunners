@@ -8,6 +8,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
 import team.dovecotmc.gunners.Gunners;
 import team.dovecotmc.gunners.compat.gun.cgm.CgmHandler;
+import team.dovecotmc.gunners.compat.gun.tac.TacHandler;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -21,32 +22,26 @@ public class CompatHandler {
     public static final Path gunnersDir = FMLPaths.CONFIGDIR.get().resolve("gunners");
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public final boolean cgmLoaded;
+    public final boolean tacLoaded;
     public final boolean recruitsLoaded;
     public final boolean guardVillagersLoaded;
 
     public CompatHandler() {
         final Config cfg = getCompatConfig();
-        boolean cgm = false;
-        if (cfg.cgm) try {
-            Class.forName("com.mrcrayfish.guns.GunMod", false, this.getClass().getClassLoader());
-            cgm = true;
+        cgmLoaded = getViaCfgAndClass(cfg.cgm, "com.mrcrayfish.guns.GunMod");
+        tacLoaded = getViaCfgAndClass(cfg.tac, "com.tac.guns.GunMod");
+        recruitsLoaded = getViaCfgAndClass(cfg.recruits, "com.talhanation.recruits.Main");
+        guardVillagersLoaded = getViaCfgAndClass(cfg.guardVillagers, "tallestegg.guardvillagers.GuardVillagers");
+    }
+
+    private boolean getViaCfgAndClass(boolean cfg, String className) {
+        if (!cfg) return false;
+        try {
+            Class.forName(className, false, this.getClass().getClassLoader());
+            return true;
         } catch (Exception ignored) {
         }
-        cgmLoaded = cgm;
-        boolean recruits = false;
-        if (cfg.recruits) try {
-            Class.forName("com.talhanation.recruits.Main", false, this.getClass().getClassLoader());
-            recruits = true;
-        } catch (Exception ignored) {
-        }
-        recruitsLoaded = recruits;
-        boolean guardVillagers = false;
-        if (cfg.guardVillagers) try {
-            Class.forName("tallestegg.guardvillagers.GuardVillagers", false, this.getClass().getClassLoader());
-            guardVillagers = true;
-        } catch (Exception ignored) {
-        }
-        guardVillagersLoaded = guardVillagers;
+        return false;
     }
 
     public static CompatHandler getInstance() {
@@ -60,11 +55,16 @@ public class CompatHandler {
             pose = CgmHandler.poseForAiming(mainHand);
             if (pose.isPresent()) return pose;
         }
+        if (instance.tacLoaded) {
+            pose = TacHandler.poseForAiming(mainHand);
+            if (pose.isPresent()) return pose;
+        }
         return Optional.empty();
     }
 
     public static boolean isGun(ItemStack stack) {
         if (instance.cgmLoaded && CgmHandler.isGun(stack)) return true;
+        if (instance.tacLoaded && TacHandler.isGun(stack)) return true;
         return false;
     }
 
@@ -105,6 +105,7 @@ public class CompatHandler {
 
     public static class Config {
         public boolean cgm = true;
+        public boolean tac = true;
         public boolean recruits = true;
         public boolean guardVillagers = true;
     }
