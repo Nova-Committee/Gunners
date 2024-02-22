@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.CompatHandler;
 import team.dovecotmc.gunners.compat.shooter.recruits.ai.RecruitCgmGunAttackGoal;
+import team.dovecotmc.gunners.compat.shooter.recruits.ai.RecruitJegGunAttackGoal;
 
 @Mixin(CrossBowmanEntity.class)
 public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity implements IEntityCanReload {
@@ -33,6 +34,8 @@ public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity imple
     private void inject$registerGoals(CallbackInfo ci) {
         if (CompatHandler.getInstance().cgmLoaded)
             this.goalSelector.addGoal(0, new RecruitCgmGunAttackGoal((CrossBowmanEntity) (Object) this, this.getMeleeStartRange()));
+        if (CompatHandler.getInstance().jegLoaded)
+            this.goalSelector.addGoal(0, new RecruitJegGunAttackGoal((CrossBowmanEntity) (Object) this, this.getMeleeStartRange()));
     }
 
     @Inject(method = "wantsToPickUp", at = @At("HEAD"), cancellable = true)

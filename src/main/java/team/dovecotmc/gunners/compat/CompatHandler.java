@@ -8,6 +8,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
 import team.dovecotmc.gunners.Gunners;
 import team.dovecotmc.gunners.compat.gun.cgm.CgmHandler;
+import team.dovecotmc.gunners.compat.gun.jeg.JegHandler;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -19,39 +20,35 @@ import java.util.Optional;
 public class CompatHandler {
     private static CompatHandler instance;
     public static final Path gunnersDir = FMLPaths.CONFIGDIR.get().resolve("gunners");
+    public static final Path cfgPath = gunnersDir.resolve("gunners-compat.json");
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public final boolean cgmLoaded;
+    public final boolean jegLoaded;
     public final boolean recruitsLoaded;
     public final boolean guardVillagersLoaded;
 
     public CompatHandler() {
         final Config cfg = getCompatConfig();
-        boolean cgm = false;
-        if (cfg.cgm) try {
-            Class.forName("com.mrcrayfish.guns.GunMod", false, this.getClass().getClassLoader());
-            cgm = true;
-        } catch (Exception ignored) {
-        }
-        cgmLoaded = cgm;
-        boolean recruits = false;
-        if (cfg.recruits) try {
-            Class.forName("com.talhanation.recruits.Main", false, this.getClass().getClassLoader());
-            recruits = true;
-        } catch (Exception ignored) {
-        }
-        recruitsLoaded = recruits;
-        boolean guardVillagers = false;
-        if (cfg.guardVillagers) try {
-            Class.forName("tallestegg.guardvillagers.GuardVillagers", false, this.getClass().getClassLoader());
-            guardVillagers = true;
-        } catch (Exception ignored) {
-        }
-        guardVillagersLoaded = guardVillagers;
+        cgmLoaded = getViaCfgAndClass(cfg.cgm, "com.mrcrayfish.guns.GunMod");
+        jegLoaded = getViaCfgAndClass(cfg.jeg, "ttv.alanorMiga.jeg.JustEnoughGuns");
+        recruitsLoaded = getViaCfgAndClass(cfg.recruits, "com.talhanation.recruits.Main");
+        guardVillagersLoaded = getViaCfgAndClass(cfg.guardVillagers, "tallestegg.guardvillagers.GuardVillagers");
+        saveOffsetConfig(cfgPath, cfg);
     }
 
     public static CompatHandler getInstance() {
         if (instance == null) instance = new CompatHandler();
         return instance;
+    }
+
+    private boolean getViaCfgAndClass(boolean cfg, String className) {
+        if (!cfg) return false;
+        try {
+            Class.forName(className, false, this.getClass().getClassLoader());
+            return true;
+        } catch (Exception ignored) {
+        }
+        return false;
     }
 
     public static Optional<HumanoidModel.ArmPose> poseForAiming(ItemStack mainHand) {
@@ -60,11 +57,16 @@ public class CompatHandler {
             pose = CgmHandler.poseForAiming(mainHand);
             if (pose.isPresent()) return pose;
         }
+        if (instance.jegLoaded) {
+            pose = JegHandler.poseForAiming(mainHand);
+            if (pose.isPresent()) return pose;
+        }
         return Optional.empty();
     }
 
     public static boolean isGun(ItemStack stack) {
         if (instance.cgmLoaded && CgmHandler.isGun(stack)) return true;
+        if (instance.jegLoaded && JegHandler.isGun(stack)) return true;
         return false;
     }
 
@@ -78,7 +80,6 @@ public class CompatHandler {
                 return new Config();
             }
         }
-        final Path cfgPath = gunnersDir.resolve("gunners-compat.json");
         Config config = new Config();
         if (cfgPath.toFile().isFile()) {
             try {
@@ -103,8 +104,17 @@ public class CompatHandler {
         return false;
     }
 
+    private static void saveOffsetConfig(Path cfgPath, Config config) {
+        try {
+            FileUtils.write(cfgPath.toFile(), GSON.toJson(config), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            Gunners.LOGGER.error(String.format("Failed to save gunners compat config \"%s\"", cfgPath), e);
+        }
+    }
+
     public static class Config {
         public boolean cgm = true;
+        public boolean jeg = true;
         public boolean recruits = true;
         public boolean guardVillagers = true;
     }

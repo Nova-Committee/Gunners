@@ -148,6 +148,7 @@ dependencies {
 
     implementation fg.deobf("curse.maven:framework-549225:${framework_file_id}")
     implementation fg.deobf("curse.maven:mrcrayfishs-gun-mod-unofficial-945471:${cgm_file_id}")
+    implementation fg.deobf("curse.maven:just-enough-guns-820727:${jeg_file_id}")
     implementation fg.deobf("curse.maven:guard-villagers-360203:${guard_villagers_file_id}")
     implementation fg.deobf("curse.maven:recruits-523860:${recruits_file_id}")
     implementation fg.deobf("curse.maven:geckolib-388172:${geckolib_file_id}")

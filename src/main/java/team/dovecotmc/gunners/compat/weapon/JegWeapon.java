@@ -1,18 +1,6 @@
 package team.dovecotmc.gunners.compat.weapon;
 
 import com.mrcrayfish.framework.api.network.LevelLocation;
-import com.mrcrayfish.guns.Config;
-import com.mrcrayfish.guns.common.Gun;
-import com.mrcrayfish.guns.common.ProjectileManager;
-import com.mrcrayfish.guns.entity.ProjectileEntity;
-import com.mrcrayfish.guns.init.ModEnchantments;
-import com.mrcrayfish.guns.init.ModItems;
-import com.mrcrayfish.guns.interfaces.IProjectileFactory;
-import com.mrcrayfish.guns.item.GunItem;
-import com.mrcrayfish.guns.network.PacketHandler;
-import com.mrcrayfish.guns.network.message.S2CMessageBulletTrail;
-import com.mrcrayfish.guns.util.GunEnchantmentHelper;
-import com.mrcrayfish.guns.util.GunModifierHelper;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
@@ -26,24 +14,36 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import team.dovecotmc.gunners.api.IWeapon;
+import ttv.alanorMiga.jeg.Config;
+import ttv.alanorMiga.jeg.common.Gun;
+import ttv.alanorMiga.jeg.common.ProjectileManager;
+import ttv.alanorMiga.jeg.entity.ProjectileEntity;
+import ttv.alanorMiga.jeg.init.ModEnchantments;
+import ttv.alanorMiga.jeg.init.ModItems;
+import ttv.alanorMiga.jeg.interfaces.IProjectileFactory;
+import ttv.alanorMiga.jeg.item.GunItem;
+import ttv.alanorMiga.jeg.network.PacketHandler;
+import ttv.alanorMiga.jeg.network.message.S2CMessageBulletTrail;
+import ttv.alanorMiga.jeg.util.GunEnchantmentHelper;
+import ttv.alanorMiga.jeg.util.GunModifierHelper;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CgmWeapon implements IWeapon {
+public class JegWeapon implements IWeapon {
     private final ItemStack gunStack;
     private SoundEvent fireSound;
     private SoundEvent loadSound;
     private Item ammo;
     private final Gun gun;
 
-    public CgmWeapon(ItemStack stack) {
+    public JegWeapon(ItemStack stack) {
         if (stack.getItem() instanceof GunItem g) {
             this.gunStack = stack;
             this.gun = g.getModifiedGun(stack);
         } else {
-            this.gunStack = ModItems.PISTOL.get().getDefaultInstance();
-            this.gun = ModItems.PISTOL.get().getGun();
+            this.gunStack = ModItems.REVOLVER.get().getDefaultInstance();
+            this.gun = ModItems.REVOLVER.get().getGun();
         }
     }
 
@@ -64,7 +64,7 @@ public class CgmWeapon implements IWeapon {
 
     @Override
     public int getWeaponLoadTime() {
-        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun) / gun.getGeneral().getReloadAmount() * 2;
+        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun) / gun.getReloads().getReloadAmount() * 2;
     }
 
     @Override
