@@ -7,8 +7,8 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
 import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.weapon.JegWeapon;
-import ttv.alanorMiga.jeg.init.ModItems;
-import ttv.alanorMiga.jeg.item.GunItem;
+import ttv.migami.jeg.init.ModItems;
+import ttv.migami.jeg.item.GunItem;
 
 public abstract class JegGunAttackGoal<T extends Mob> extends Goal {
     protected final T shooter;

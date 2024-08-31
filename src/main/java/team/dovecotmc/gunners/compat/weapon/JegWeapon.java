@@ -14,18 +14,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import team.dovecotmc.gunners.api.IWeapon;
-import ttv.alanorMiga.jeg.Config;
-import ttv.alanorMiga.jeg.common.Gun;
-import ttv.alanorMiga.jeg.common.ProjectileManager;
-import ttv.alanorMiga.jeg.entity.ProjectileEntity;
-import ttv.alanorMiga.jeg.init.ModEnchantments;
-import ttv.alanorMiga.jeg.init.ModItems;
-import ttv.alanorMiga.jeg.interfaces.IProjectileFactory;
-import ttv.alanorMiga.jeg.item.GunItem;
-import ttv.alanorMiga.jeg.network.PacketHandler;
-import ttv.alanorMiga.jeg.network.message.S2CMessageBulletTrail;
-import ttv.alanorMiga.jeg.util.GunEnchantmentHelper;
-import ttv.alanorMiga.jeg.util.GunModifierHelper;
+import ttv.migami.jeg.Config;
+import ttv.migami.jeg.common.Gun;
+import ttv.migami.jeg.common.ProjectileManager;
+import ttv.migami.jeg.entity.projectile.ProjectileEntity;
+import ttv.migami.jeg.init.ModEnchantments;
+import ttv.migami.jeg.init.ModItems;
+import ttv.migami.jeg.interfaces.IProjectileFactory;
+import ttv.migami.jeg.item.GunItem;
+import ttv.migami.jeg.network.PacketHandler;
+import ttv.migami.jeg.network.message.S2CMessageBulletTrail;
+import ttv.migami.jeg.util.GunEnchantmentHelper;
+import ttv.migami.jeg.util.GunModifierHelper;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
@@ -64,7 +64,7 @@ public class JegWeapon implements IWeapon {
 
     @Override
     public int getWeaponLoadTime() {
-        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun) / gun.getReloads().getReloadAmount() * 2;
+        return GunEnchantmentHelper.getRealReloadSpeed(gunStack);
     }
 
     @Override
@@ -156,11 +156,11 @@ public class JegWeapon implements IWeapon {
     }
 
     public int consumeAmmoInInv(SimpleContainer inv) {
-        return inv.removeItemType(getAmmo(), GunEnchantmentHelper.getAmmoCapacity(gunStack, gun)).getCount();
+        return inv.removeItemType(getAmmo(), gun.getReloads().getMaxAmmo()).getCount();
     }
 
     public int consumeAmmoFromVoid() {
-        return GunEnchantmentHelper.getAmmoCapacity(gunStack, gun);
+        return gun.getReloads().getMaxAmmo();
     }
 
     public boolean hasAmmoInInv(SimpleContainer inv) {

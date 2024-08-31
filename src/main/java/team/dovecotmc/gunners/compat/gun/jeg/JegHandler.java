@@ -2,7 +2,7 @@ package team.dovecotmc.gunners.compat.gun.jeg;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.item.ItemStack;
-import ttv.alanorMiga.jeg.item.GunItem;
+import ttv.migami.jeg.item.GunItem;
 
 import java.util.Optional;
 
