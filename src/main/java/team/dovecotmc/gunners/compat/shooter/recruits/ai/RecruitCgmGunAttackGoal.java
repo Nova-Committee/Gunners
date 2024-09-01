@@ -41,7 +41,7 @@ public class RecruitCgmGunAttackGoal extends CgmGunAttackGoal<CrossBowmanEntity>
                 }
             }
 
-            if (this.shooter.getShouldHoldPos() && this.shooter.getHoldPos() != null && !this.shooter.getHoldPos().closerThan(this.shooter.getOnPos(), 5.0)) {
+            if (this.shooter.getShouldHoldPos() && this.shooter.getHoldPos() != null && !this.shooter.getHoldPos().closerThan(Vec3.atCenterOf(this.shooter.getOnPos()), 5.0)) {
                 this.shooter.setAggressive(true);
                 this.shooter.getNavigation().moveTo(target, this.speedModifier);
             }
