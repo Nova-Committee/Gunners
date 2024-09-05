@@ -24,13 +24,15 @@ public class CompatHandler {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public final boolean cgmLoaded;
     public final boolean jegLoaded;
+    public final boolean taczLoaded;
     public final boolean recruitsLoaded;
     public final boolean guardVillagersLoaded;
 
     public CompatHandler() {
         final Config cfg = getCompatConfig();
         cgmLoaded = getViaCfgAndClass(cfg.cgm, "com.mrcrayfish.guns.GunMod");
-        jegLoaded = getViaCfgAndClass(cfg.jeg, "ttv.alanorMiga.jeg.JustEnoughGuns");
+        jegLoaded = getViaCfgAndClass(cfg.jeg, "ttv.migami.jeg.JustEnoughGuns");
+        taczLoaded = getViaCfgAndClass(cfg.tacz, "");
         recruitsLoaded = getViaCfgAndClass(cfg.recruits, "com.talhanation.recruits.Main");
         guardVillagersLoaded = getViaCfgAndClass(cfg.guardVillagers, "tallestegg.guardvillagers.GuardVillagers");
         saveOffsetConfig(cfgPath, cfg);
@@ -115,6 +117,7 @@ public class CompatHandler {
     public static class Config {
         public boolean cgm = true;
         public boolean jeg = true;
+        public boolean tacz = true;
         public boolean recruits = true;
         public boolean guardVillagers = true;
     }
