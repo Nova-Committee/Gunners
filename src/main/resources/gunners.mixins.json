@@ -11,8 +11,8 @@
   ],
   "client": [
     "client.guardvillagers.MixinGuardRenderer",
-    "client.recruits.MixinAbstractRecruitHumanRenderer",
-    "client.recruits.MixinAbstractRecruitVillagerRenderer"
+    "client.recruits.MixinRecruitHumanRenderer",
+    "client.recruits.MixinRecruitVillagerRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

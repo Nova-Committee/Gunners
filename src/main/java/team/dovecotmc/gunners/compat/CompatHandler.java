@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import team.dovecotmc.gunners.Gunners;
 import team.dovecotmc.gunners.compat.gun.cgm.CgmHandler;
 import team.dovecotmc.gunners.compat.gun.jeg.JegHandler;
+import team.dovecotmc.gunners.compat.gun.scguns.ScGunsHandler;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -24,7 +25,8 @@ public class CompatHandler {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public final boolean cgmLoaded;
     public final boolean jegLoaded;
-    public final boolean taczLoaded;
+    //public final boolean taczLoaded;
+    public final boolean scGunsLoaded;
     public final boolean recruitsLoaded;
     public final boolean guardVillagersLoaded;
 
@@ -32,7 +34,8 @@ public class CompatHandler {
         final Config cfg = getCompatConfig();
         cgmLoaded = getViaCfgAndClass(cfg.cgm, "com.mrcrayfish.guns.GunMod");
         jegLoaded = getViaCfgAndClass(cfg.jeg, "ttv.migami.jeg.JustEnoughGuns");
-        taczLoaded = getViaCfgAndClass(cfg.tacz, "");
+        //taczLoaded = getViaCfgAndClass(cfg.tacz, "com.tacz.guns.GunMod");
+        scGunsLoaded = getViaCfgAndClass(cfg.scorched_guns, "top.ribs.scguns.ScorchedGuns");
         recruitsLoaded = getViaCfgAndClass(cfg.recruits, "com.talhanation.recruits.Main");
         guardVillagersLoaded = getViaCfgAndClass(cfg.guardVillagers, "tallestegg.guardvillagers.GuardVillagers");
         saveOffsetConfig(cfgPath, cfg);
@@ -63,12 +66,18 @@ public class CompatHandler {
             pose = JegHandler.poseForAiming(mainHand);
             if (pose.isPresent()) return pose;
         }
+        if (instance.scGunsLoaded) {
+            pose = ScGunsHandler.poseForAiming(mainHand);
+            if (pose.isPresent()) return pose;
+        }
         return Optional.empty();
     }
 
     public static boolean isGun(ItemStack stack) {
         if (instance.cgmLoaded && CgmHandler.isGun(stack)) return true;
         if (instance.jegLoaded && JegHandler.isGun(stack)) return true;
+        //if (instance.taczLoaded && TaCZHandler.isGun(stack)) return true;
+        if (instance.scGunsLoaded && ScGunsHandler.isGun(stack)) return true;
         return false;
     }
 
@@ -117,7 +126,8 @@ public class CompatHandler {
     public static class Config {
         public boolean cgm = true;
         public boolean jeg = true;
-        public boolean tacz = true;
+        //public boolean tacz = true;
+        public boolean scorched_guns = true;
         public boolean recruits = true;
         public boolean guardVillagers = true;
     }

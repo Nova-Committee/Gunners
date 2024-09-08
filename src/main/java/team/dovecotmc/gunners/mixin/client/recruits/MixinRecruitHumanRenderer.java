@@ -2,9 +2,8 @@ package team.dovecotmc.gunners.mixin.client.recruits;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.talhanation.recruits.client.render.RecruitHumanRenderer;
-import com.talhanation.recruits.entities.AbstractInventoryEntity;
 import com.talhanation.recruits.entities.AbstractRecruitEntity;
-import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -15,8 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import team.dovecotmc.gunners.compat.CompatHandler;
 
 @Mixin(RecruitHumanRenderer.class)
-public abstract class MixinAbstractRecruitHumanRenderer<T extends AbstractInventoryEntity> extends MobRenderer<T, PlayerModel<T>> {
-    public MixinAbstractRecruitHumanRenderer(EntityRendererProvider.Context c, PlayerModel<T> m, float f) {
+public abstract class MixinRecruitHumanRenderer extends MobRenderer<AbstractRecruitEntity, HumanoidModel<AbstractRecruitEntity>> {
+
+    public MixinRecruitHumanRenderer(EntityRendererProvider.Context c, HumanoidModel<AbstractRecruitEntity> m, float f) {
         super(c, m, f);
     }
 

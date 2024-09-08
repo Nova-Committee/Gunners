@@ -14,9 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import team.dovecotmc.gunners.compat.CompatHandler;
 
 @Mixin(RecruitVillagerRenderer.class)
-public abstract class MixinAbstractRecruitVillagerRenderer extends MobRenderer<AbstractRecruitEntity, HumanoidModel<AbstractRecruitEntity>> {
+public abstract class MixinRecruitVillagerRenderer extends MobRenderer<AbstractRecruitEntity, HumanoidModel<AbstractRecruitEntity>> {
 
-    public MixinAbstractRecruitVillagerRenderer(EntityRendererProvider.Context ctx, HumanoidModel<AbstractRecruitEntity> m, float f) {
+    public MixinRecruitVillagerRenderer(EntityRendererProvider.Context ctx, HumanoidModel<AbstractRecruitEntity> m, float f) {
         super(ctx, m, f);
     }
 

@@ -13,6 +13,7 @@ import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.CompatHandler;
 import team.dovecotmc.gunners.compat.shooter.guardvillagers.ai.GVCgmGunAttackGoal;
 import team.dovecotmc.gunners.compat.shooter.guardvillagers.ai.GVJegGunAttackGoal;
+import team.dovecotmc.gunners.compat.shooter.guardvillagers.ai.GVScGunsGunAttackGoal;
 
 @Mixin(Guard.class)
 public abstract class MixinGuard extends PathfinderMob implements IEntityCanReload {
@@ -29,6 +30,8 @@ public abstract class MixinGuard extends PathfinderMob implements IEntityCanRelo
             this.goalSelector.addGoal(0, new GVCgmGunAttackGoal((Guard) (Object) this, 0.0));
         if (CompatHandler.getInstance().jegLoaded)
             this.goalSelector.addGoal(0, new GVJegGunAttackGoal((Guard) (Object) this, 0.0));
+        if (CompatHandler.getInstance().scGunsLoaded)
+            this.goalSelector.addGoal(0, new GVScGunsGunAttackGoal((Guard) (Object) this, 0.0));
     }
 
     @Override
