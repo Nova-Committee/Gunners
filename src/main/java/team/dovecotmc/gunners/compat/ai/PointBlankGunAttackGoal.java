@@ -4,10 +4,13 @@ import com.vicmatskiv.pointblank.item.AmmoItem;
 import com.vicmatskiv.pointblank.item.FireModeInstance;
 import com.vicmatskiv.pointblank.item.GunItem;
 import com.vicmatskiv.pointblank.util.HitScan;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -18,6 +21,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 import team.dovecotmc.gunners.compat.CompatHandler;
 
 import java.util.EnumSet;
@@ -30,6 +34,7 @@ import java.util.function.Supplier;
 public final class PointBlankGunAttackGoal extends Goal {
     private static final double RANGE = 17;
     private static final int RELOAD_TICKS = 40;
+    private static final DustParticleOptions TRACER = new DustParticleOptions(new Vector3f(1.0F, 0.78F, 0.32F), 0.45F);
 
     private final PathfinderMob shooter;
     private final DoubleSupplier minimumRange;
@@ -100,7 +105,7 @@ public final class PointBlankGunAttackGoal extends Goal {
     public void tick() {
         LivingEntity target = shooter.getTarget();
         ItemStack held = shooter.getMainHandItem();
-        if (target == null || !target.isAlive() || !isGun(held)) return;
+        if (!(shooter.level() instanceof ServerLevel level) || target == null || !target.isAlive() || !isGun(held)) return;
         GunItem gun = (GunItem) held.getItem();
         FireModeInstance mode = selectedMode(gun, held);
         if (!supportsMode(gun, mode)) return;
@@ -140,6 +145,7 @@ public final class PointBlankGunAttackGoal extends Goal {
         if (loaded != GunItem.INFINITE_AMMO) GunItem.setAmmo(held, mode, loaded - 1);
         SoundEvent sound = gun.getFireSound();
         if (sound != null) shooter.playSound(sound, gun.getFireSoundVolume(), 1.0F);
+        showShot(level, start, direction, entityHit.getLocation());
         int pellets = mode.getPelletCount() > 0 ? mode.getPelletCount() : gun.getPelletCount();
         // Point Blank discards the projectile argument after impact. Hitscan shots have no projectile entity.
         if (pellets <= 1) {
@@ -155,6 +161,22 @@ public final class PointBlankGunAttackGoal extends Goal {
         }
         int rpm = mode.getRpm() > 0 ? mode.getRpm() : gun.getRpm();
         shotDelay = (int) Math.ceil(1200.0 / Math.max(1, rpm));
+    }
+
+    private void showShot(ServerLevel level, Vec3 eye, Vec3 direction, Vec3 impact) {
+        // Point Blank's hitscan effects require player gun state. Approximate the NPC's muzzle from its main arm.
+        double side = shooter.getMainArm() == HumanoidArm.RIGHT ? 1.0 : -1.0;
+        double width = shooter.getBbWidth();
+        Vec3 sideways = direction.cross(new Vec3(0, 1, 0)).normalize();
+        Vec3 muzzle = eye.add(0, -0.4 * width, 0)
+                .add(sideways.scale(side * 0.45 * width))
+                .add(direction.scale(Math.min(width, eye.distanceTo(impact) * 0.5)));
+        level.sendParticles(ParticleTypes.SMALL_FLAME, muzzle.x, muzzle.y, muzzle.z, 3, 0.035, 0.035, 0.035, 0.02);
+        int segments = Math.min(12, (int) Math.ceil(muzzle.distanceTo(impact) * 2));
+        for (int segment = 1; segment < segments; segment++) {
+            Vec3 point = muzzle.lerp(impact, (double) segment / segments);
+            level.sendParticles(TRACER, point.x, point.y, point.z, 1, 0, 0, 0, 0);
+        }
     }
 
     private void reload(GunItem gun, ItemStack held, FireModeInstance mode) {
