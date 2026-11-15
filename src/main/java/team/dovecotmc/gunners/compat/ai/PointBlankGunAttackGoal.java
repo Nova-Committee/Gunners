@@ -11,7 +11,10 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -127,10 +130,12 @@ public final class PointBlankGunAttackGoal extends Goal {
 
         Vec3 start = shooter.getEyePosition();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
-        // Use Point Blank's native trace and damage entry points without its player packet handler.
-        HitResult hit = HitScan.getNearestObjectInCrosshair(shooter, start, direction, 0, range,
-                block -> false, block -> false, null);
-        if (!(hit instanceof EntityHitResult entityHit) || entityHit.getEntity() != target || protects.test(target)) return;
+        Vec3 end = start.add(direction.scale(range));
+        Vec3 unobstructedEnd = shooter.level().clip(new ClipContext(start, end,
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, shooter)).getLocation();
+        EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(shooter.level(), shooter, start, unobstructedEnd,
+                new AABB(start, unobstructedEnd).inflate(1.0), entity -> entity.isPickable() && !entity.isSpectator());
+        if (entityHit == null || entityHit.getEntity() != target || protects.test(target)) return;
 
         if (loaded != GunItem.INFINITE_AMMO) GunItem.setAmmo(held, mode, loaded - 1);
         SoundEvent sound = gun.getFireSound();

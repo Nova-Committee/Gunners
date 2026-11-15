@@ -15,7 +15,8 @@
     "client.guardvillagers.MixinGuardRenderer",
     "client.recruits.MixinRecruitHumanRenderer",
     "client.recruits.MixinRecruitVillagerRenderer",
-    "client.MixinGunItemInHandLayer"
+    "client.MixinGunItemInHandLayer",
+    "client.pointblank.MixinGunItemRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

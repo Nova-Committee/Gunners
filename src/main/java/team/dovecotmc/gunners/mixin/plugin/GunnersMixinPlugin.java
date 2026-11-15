@@ -29,6 +29,7 @@ public class GunnersMixinPlugin implements IMixinConfigPlugin {
         }
         if (mixinClassName.contains(".common.tacz.")) return CompatHandler.getInstance().taczLoaded;
         if (mixinClassName.contains(".common.sbw.")) return CompatHandler.getInstance().superbWarfareLoaded;
+        if (mixinClassName.contains(".client.pointblank.")) return CompatHandler.getInstance().pointBlankLoaded;
         return true;
     }
 
