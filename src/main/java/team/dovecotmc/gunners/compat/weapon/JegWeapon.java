@@ -3,6 +3,7 @@ package team.dovecotmc.gunners.compat.weapon;
 import com.mrcrayfish.framework.api.network.LevelLocation;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleContainer;
@@ -16,6 +17,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import team.dovecotmc.gunners.api.IWeapon;
 import ttv.migami.jeg.Config;
 import ttv.migami.jeg.common.Gun;
+import ttv.migami.jeg.common.ReloadType;
 import ttv.migami.jeg.common.ProjectileManager;
 import ttv.migami.jeg.entity.projectile.ProjectileEntity;
 import ttv.migami.jeg.init.ModEnchantments;
@@ -27,14 +29,12 @@ import ttv.migami.jeg.network.message.S2CMessageBulletTrail;
 import ttv.migami.jeg.util.GunEnchantmentHelper;
 import ttv.migami.jeg.util.GunModifierHelper;
 
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class JegWeapon implements IWeapon {
     private final ItemStack gunStack;
     private SoundEvent fireSound;
     private SoundEvent loadSound;
-    private Item ammo;
     private final Gun gun;
 
     public JegWeapon(ItemStack stack) {
@@ -88,9 +88,18 @@ public class JegWeapon implements IWeapon {
 
     @Override
     public SoundEvent getLoadSound() {
-        if (loadSound == null)
-            loadSound = ForgeRegistries.SOUND_EVENTS.getValue(gun.getSounds().getReload());
+        ResourceLocation soundId = gun.getSounds().getReloadLoad();
+        if (loadSound == null && soundId != null) {
+            loadSound = ForgeRegistries.SOUND_EVENTS.getValue(soundId);
+        }
         return loadSound;
+    }
+
+    public void playLoadSound(Mob shooter) {
+        SoundEvent sound = getLoadSound();
+        if (sound != null) {
+            shooter.playSound(sound, 1.0F, 1.0F / (shooter.getRandom().nextFloat() * 0.4F + 0.8F));
+        }
     }
 
     @Override
@@ -156,20 +165,31 @@ public class JegWeapon implements IWeapon {
     }
 
     public int consumeAmmoInInv(SimpleContainer inv) {
-        return inv.removeItemType(getAmmo(), gun.getReloads().getMaxAmmo()).getCount();
+        Item ammo = getAmmo();
+        if (ammo == null) return 0;
+
+        int capacity = consumeAmmoFromVoid();
+        if (usesReloadItem()) {
+            return inv.removeItemType(ammo, 1).isEmpty() ? 0 : capacity;
+        }
+        return inv.removeItemType(ammo, capacity).getCount();
     }
 
     public int consumeAmmoFromVoid() {
-        return gun.getReloads().getMaxAmmo();
+        return GunModifierHelper.getModifiedAmmoCapacity(gunStack, gun);
     }
 
     public boolean hasAmmoInInv(SimpleContainer inv) {
-        return inv.hasAnyMatching(s -> s.is(getAmmo()));
+        Item ammo = getAmmo();
+        return ammo != null && inv.hasAnyMatching(stack -> !stack.isEmpty() && stack.is(ammo));
     }
 
     private Item getAmmo() {
-        if (ammo == null)
-            ammo = Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(gun.getProjectile().getItem()));
-        return ammo;
+        ResourceLocation ammoId = usesReloadItem() ? gun.getReloads().getReloadItem() : gun.getProjectile().getItem();
+        return ammoId == null ? null : ForgeRegistries.ITEMS.getValue(ammoId);
+    }
+
+    private boolean usesReloadItem() {
+        return gun.getReloads().getReloadType() == ReloadType.SINGLE_ITEM;
     }
 }

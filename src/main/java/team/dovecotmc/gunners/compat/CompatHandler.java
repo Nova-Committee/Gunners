@@ -9,7 +9,8 @@ import org.apache.commons.io.FileUtils;
 import team.dovecotmc.gunners.Gunners;
 import team.dovecotmc.gunners.compat.gun.cgm.CgmHandler;
 import team.dovecotmc.gunners.compat.gun.jeg.JegHandler;
-import team.dovecotmc.gunners.compat.gun.scguns.ScGunsHandler;
+import team.dovecotmc.gunners.compat.gun.tacz.TaczHandler;
+import team.dovecotmc.gunners.compat.ai.SbwGunAttackGoal;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -25,8 +26,9 @@ public class CompatHandler {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public final boolean cgmLoaded;
     public final boolean jegLoaded;
-    //public final boolean taczLoaded;
-    public final boolean scGunsLoaded;
+    public final boolean taczLoaded;
+    public final boolean superbWarfareLoaded;
+    public final boolean finiteReserveAmmo;
     public final boolean recruitsLoaded;
     public final boolean guardVillagersLoaded;
 
@@ -34,8 +36,9 @@ public class CompatHandler {
         final Config cfg = getCompatConfig();
         cgmLoaded = getViaCfgAndClass(cfg.cgm, "com.mrcrayfish.guns.GunMod");
         jegLoaded = getViaCfgAndClass(cfg.jeg, "ttv.migami.jeg.JustEnoughGuns");
-        //taczLoaded = getViaCfgAndClass(cfg.tacz, "com.tacz.guns.GunMod");
-        scGunsLoaded = getViaCfgAndClass(cfg.scorched_guns, "top.ribs.scguns.ScorchedGuns");
+        taczLoaded = getViaCfgAndClass(cfg.tacz, "com.tacz.guns.GunMod");
+        superbWarfareLoaded = getViaCfgAndClass(cfg.superbWarfare, "com.atsuishio.superbwarfare.Mod");
+        finiteReserveAmmo = cfg.finiteReserveAmmo;
         recruitsLoaded = getViaCfgAndClass(cfg.recruits, "com.talhanation.recruits.Main");
         guardVillagersLoaded = getViaCfgAndClass(cfg.guardVillagers, "tallestegg.guardvillagers.GuardVillagers");
         saveOffsetConfig(cfgPath, cfg);
@@ -66,19 +69,21 @@ public class CompatHandler {
             pose = JegHandler.poseForAiming(mainHand);
             if (pose.isPresent()) return pose;
         }
-        if (instance.scGunsLoaded) {
-            pose = ScGunsHandler.poseForAiming(mainHand);
-            if (pose.isPresent()) return pose;
-        }
-        return Optional.empty();
+        return isSbwGun(mainHand) ? Optional.of(HumanoidModel.ArmPose.CROSSBOW_HOLD) : Optional.empty();
+    }
+
+    public static boolean isTaczGun(ItemStack stack) {
+        return getInstance().taczLoaded && TaczHandler.isGun(stack);
+    }
+
+    public static boolean isSbwGun(ItemStack stack) {
+        return getInstance().superbWarfareLoaded && SbwGunAttackGoal.isGun(stack);
     }
 
     public static boolean isGun(ItemStack stack) {
         if (instance.cgmLoaded && CgmHandler.isGun(stack)) return true;
         if (instance.jegLoaded && JegHandler.isGun(stack)) return true;
-        //if (instance.taczLoaded && TaCZHandler.isGun(stack)) return true;
-        if (instance.scGunsLoaded && ScGunsHandler.isGun(stack)) return true;
-        return false;
+        return isTaczGun(stack) || isSbwGun(stack);
     }
 
     @Nonnull
@@ -126,8 +131,9 @@ public class CompatHandler {
     public static class Config {
         public boolean cgm = true;
         public boolean jeg = true;
-        //public boolean tacz = true;
-        public boolean scorched_guns = true;
+        public boolean tacz = true;
+        public boolean superbWarfare = true;
+        public boolean finiteReserveAmmo = false;
         public boolean recruits = true;
         public boolean guardVillagers = true;
     }

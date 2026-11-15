@@ -110,7 +110,7 @@ public abstract class JegGunAttackGoal<T extends Mob> extends Goal {
                     int i = getReloadable().gunners$getReloadTick();
                     if (i >= this.weaponLoadTime) {
                         getReloadable().gunners$setReloadTick(0);
-                        this.shooter.playSound(this.weapon.getLoadSound(), 1.0F, 1.0F / (this.shooter.getRandom().nextFloat() * 0.4F + 0.8F));
+                        this.weapon.playLoadSound(this.shooter);
                         this.weapon.setLoaded(this.consumeAmmo());
                         if (target != null && target.isAlive()) {
                             this.state = State.AIMING;
