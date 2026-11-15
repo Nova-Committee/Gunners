@@ -11,6 +11,7 @@ import team.dovecotmc.gunners.compat.gun.cgm.CgmHandler;
 import team.dovecotmc.gunners.compat.gun.jeg.JegHandler;
 import team.dovecotmc.gunners.compat.gun.tacz.TaczHandler;
 import team.dovecotmc.gunners.compat.ai.SbwGunAttackGoal;
+import team.dovecotmc.gunners.compat.ai.PointBlankGunAttackGoal;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class CompatHandler {
     public final boolean jegLoaded;
     public final boolean taczLoaded;
     public final boolean superbWarfareLoaded;
+    public final boolean pointBlankLoaded;
     public final boolean finiteReserveAmmo;
     public final boolean recruitsLoaded;
     public final boolean guardVillagersLoaded;
@@ -38,6 +40,7 @@ public class CompatHandler {
         jegLoaded = getViaCfgAndClass(cfg.jeg, "ttv.migami.jeg.JustEnoughGuns");
         taczLoaded = getViaCfgAndClass(cfg.tacz, "com.tacz.guns.GunMod");
         superbWarfareLoaded = getViaCfgAndClass(cfg.superbWarfare, "com.atsuishio.superbwarfare.Mod");
+        pointBlankLoaded = getViaCfgAndClass(cfg.pointBlank, "com.vicmatskiv.pointblank.PointBlankMod");
         finiteReserveAmmo = cfg.finiteReserveAmmo;
         recruitsLoaded = getViaCfgAndClass(cfg.recruits, "com.talhanation.recruits.Main");
         guardVillagersLoaded = getViaCfgAndClass(cfg.guardVillagers, "tallestegg.guardvillagers.GuardVillagers");
@@ -69,7 +72,8 @@ public class CompatHandler {
             pose = JegHandler.poseForAiming(mainHand);
             if (pose.isPresent()) return pose;
         }
-        return isSbwGun(mainHand) ? Optional.of(HumanoidModel.ArmPose.CROSSBOW_HOLD) : Optional.empty();
+        return isSbwGun(mainHand) || isPointBlankGun(mainHand)
+                ? Optional.of(HumanoidModel.ArmPose.CROSSBOW_HOLD) : Optional.empty();
     }
 
     public static boolean isTaczGun(ItemStack stack) {
@@ -83,7 +87,11 @@ public class CompatHandler {
     public static boolean isGun(ItemStack stack) {
         if (instance.cgmLoaded && CgmHandler.isGun(stack)) return true;
         if (instance.jegLoaded && JegHandler.isGun(stack)) return true;
-        return isTaczGun(stack) || isSbwGun(stack);
+        return isTaczGun(stack) || isSbwGun(stack) || isPointBlankGun(stack);
+    }
+
+    private static boolean isPointBlankGun(ItemStack stack) {
+        return getInstance().pointBlankLoaded && PointBlankGunAttackGoal.isGun(stack);
     }
 
     @Nonnull
@@ -133,6 +141,7 @@ public class CompatHandler {
         public boolean jeg = true;
         public boolean tacz = true;
         public boolean superbWarfare = true;
+        public boolean pointBlank = true;
         public boolean finiteReserveAmmo = false;
         public boolean recruits = true;
         public boolean guardVillagers = true;

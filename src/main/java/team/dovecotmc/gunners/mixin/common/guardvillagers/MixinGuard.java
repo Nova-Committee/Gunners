@@ -15,6 +15,7 @@ import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.CompatHandler;
 import team.dovecotmc.gunners.compat.ai.TaczGunAttackGoal;
 import team.dovecotmc.gunners.compat.ai.SbwGunAttackGoal;
+import team.dovecotmc.gunners.compat.ai.PointBlankGunAttackGoal;
 import team.dovecotmc.gunners.compat.shooter.guardvillagers.ai.GVCgmGunAttackGoal;
 import team.dovecotmc.gunners.compat.shooter.guardvillagers.ai.GVJegGunAttackGoal;
 
@@ -36,7 +37,7 @@ public abstract class MixinGuard extends PathfinderMob implements IEntityCanRelo
         if (CompatHandler.getInstance().jegLoaded)
             this.goalSelector.addGoal(0, new GVJegGunAttackGoal((Guard) (Object) this, 0.0));
         CompatHandler compat = CompatHandler.getInstance();
-        if (compat.taczLoaded || compat.superbWarfareLoaded) {
+        if (compat.taczLoaded || compat.superbWarfareLoaded || compat.pointBlankLoaded) {
             Guard guard = (Guard) (Object) this;
             Predicate<LivingEntity> protects =
                     entity -> GuardConfig.FriendlyFire && (guard.isOwner(entity) || entity instanceof Guard
@@ -46,6 +47,9 @@ public abstract class MixinGuard extends PathfinderMob implements IEntityCanRelo
                     new TaczGunAttackGoal(guard, () -> 0.0, () -> !guard.isFollowing(), protects));
             if (compat.superbWarfareLoaded) this.goalSelector.addGoal(0,
                     new SbwGunAttackGoal(guard, () -> 0.0, () -> !guard.isFollowing(), protects));
+            if (compat.pointBlankLoaded) this.goalSelector.addGoal(0,
+                    new PointBlankGunAttackGoal(guard, () -> 0.0, () -> !guard.isFollowing(),
+                            protects, () -> guard.guardInventory));
         }
     }
 

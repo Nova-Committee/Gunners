@@ -17,6 +17,7 @@ import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.CompatHandler;
 import team.dovecotmc.gunners.compat.ai.TaczGunAttackGoal;
 import team.dovecotmc.gunners.compat.ai.SbwGunAttackGoal;
+import team.dovecotmc.gunners.compat.ai.PointBlankGunAttackGoal;
 import team.dovecotmc.gunners.compat.shooter.recruits.ai.RecruitCgmGunAttackGoal;
 import team.dovecotmc.gunners.compat.shooter.recruits.ai.RecruitJegGunAttackGoal;
 
@@ -49,6 +50,12 @@ public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity imple
             this.goalSelector.addGoal(0, new SbwGunAttackGoal(recruit, recruit::getMeleeStartRange,
                     () -> !recruit.isFollowing() && !recruit.getShouldHoldPos(),
                     entity -> entity == recruit.getOwner() || recruit.isAlliedTo(entity)));
+        }
+        if (CompatHandler.getInstance().pointBlankLoaded) {
+            CrossBowmanEntity recruit = (CrossBowmanEntity) (Object) this;
+            this.goalSelector.addGoal(0, new PointBlankGunAttackGoal(recruit, recruit::getMeleeStartRange,
+                    () -> !recruit.isFollowing() && !recruit.getShouldHoldPos(),
+                    entity -> entity == recruit.getOwner() || recruit.isAlliedTo(entity), recruit::getInventory));
         }
     }
 
