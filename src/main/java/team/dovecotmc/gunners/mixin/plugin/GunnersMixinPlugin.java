@@ -23,6 +23,13 @@ public class GunnersMixinPlugin implements IMixinConfigPlugin {
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains("recruits")) return CompatHandler.getInstance().recruitsLoaded;
         if (mixinClassName.contains("guardvillagers")) return CompatHandler.getInstance().guardVillagersLoaded;
+        if (mixinClassName.endsWith(".MixinGunItemInHandLayer")) {
+            CompatHandler compat = CompatHandler.getInstance();
+            return (compat.taczLoaded || compat.superbWarfareLoaded) && (compat.recruitsLoaded || compat.guardVillagersLoaded);
+        }
+        if (mixinClassName.contains(".common.tacz.")) return CompatHandler.getInstance().taczLoaded;
+        if (mixinClassName.contains(".common.sbw.")) return CompatHandler.getInstance().superbWarfareLoaded;
+        if (mixinClassName.contains(".client.pointblank.")) return CompatHandler.getInstance().pointBlankLoaded;
         return true;
     }
 

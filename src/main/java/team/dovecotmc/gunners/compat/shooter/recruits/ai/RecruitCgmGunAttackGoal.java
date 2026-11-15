@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.ai.CgmGunAttackGoal;
+import team.dovecotmc.gunners.compat.CompatHandler;
 
 public class RecruitCgmGunAttackGoal extends CgmGunAttackGoal<CrossBowmanEntity> {
     private int seeTime;
@@ -156,12 +157,13 @@ public class RecruitCgmGunAttackGoal extends CgmGunAttackGoal<CrossBowmanEntity>
 
     @Override
     public int consumeAmmo() {
-        return weapon.consumeAmmoInInv(this.shooter.getInventory());
+        return CompatHandler.getInstance().finiteReserveAmmo
+                ? weapon.consumeAmmoInInv(shooter.getInventory()) : weapon.consumeAmmoFromVoid();
     }
 
     @Override
     public boolean canLoad() {
-        return weapon.hasAmmoInInv(this.shooter.getInventory());
+        return !CompatHandler.getInstance().finiteReserveAmmo || weapon.hasAmmoInInv(shooter.getInventory());
     }
 
     private IEntityCanReload getReloadable() {

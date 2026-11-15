@@ -15,9 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import team.dovecotmc.gunners.api.IEntityCanReload;
 import team.dovecotmc.gunners.compat.CompatHandler;
+import team.dovecotmc.gunners.compat.ai.TaczGunAttackGoal;
+import team.dovecotmc.gunners.compat.ai.SbwGunAttackGoal;
+import team.dovecotmc.gunners.compat.ai.PointBlankGunAttackGoal;
 import team.dovecotmc.gunners.compat.shooter.recruits.ai.RecruitCgmGunAttackGoal;
 import team.dovecotmc.gunners.compat.shooter.recruits.ai.RecruitJegGunAttackGoal;
-import team.dovecotmc.gunners.compat.shooter.recruits.ai.RecruitScGunsGunAttackGoal;
 
 @Mixin(CrossBowmanEntity.class)
 public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity implements IEntityCanReload {
@@ -37,8 +39,24 @@ public abstract class MixinCrossBowmanEntity extends AbstractRecruitEntity imple
             this.goalSelector.addGoal(0, new RecruitCgmGunAttackGoal((CrossBowmanEntity) (Object) this, this.getMeleeStartRange()));
         if (CompatHandler.getInstance().jegLoaded)
             this.goalSelector.addGoal(0, new RecruitJegGunAttackGoal((CrossBowmanEntity) (Object) this, this.getMeleeStartRange()));
-        if (CompatHandler.getInstance().scGunsLoaded)
-            this.goalSelector.addGoal(0, new RecruitScGunsGunAttackGoal((CrossBowmanEntity) (Object) this, this.getMeleeStartRange()));
+        if (CompatHandler.getInstance().taczLoaded) {
+            CrossBowmanEntity recruit = (CrossBowmanEntity) (Object) this;
+            this.goalSelector.addGoal(0, new TaczGunAttackGoal(recruit, recruit::getMeleeStartRange,
+                    () -> !recruit.isFollowing() && !recruit.getShouldHoldPos(),
+                    entity -> entity == recruit.getOwner() || recruit.isAlliedTo(entity)));
+        }
+        if (CompatHandler.getInstance().superbWarfareLoaded) {
+            CrossBowmanEntity recruit = (CrossBowmanEntity) (Object) this;
+            this.goalSelector.addGoal(0, new SbwGunAttackGoal(recruit, recruit::getMeleeStartRange,
+                    () -> !recruit.isFollowing() && !recruit.getShouldHoldPos(),
+                    entity -> entity == recruit.getOwner() || recruit.isAlliedTo(entity)));
+        }
+        if (CompatHandler.getInstance().pointBlankLoaded) {
+            CrossBowmanEntity recruit = (CrossBowmanEntity) (Object) this;
+            this.goalSelector.addGoal(0, new PointBlankGunAttackGoal(recruit, recruit::getMeleeStartRange,
+                    () -> !recruit.isFollowing() && !recruit.getShouldHoldPos(),
+                    entity -> entity == recruit.getOwner() || recruit.isAlliedTo(entity), recruit::getInventory));
+        }
     }
 
     @Inject(method = "wantsToPickUp", at = @At("HEAD"), cancellable = true)

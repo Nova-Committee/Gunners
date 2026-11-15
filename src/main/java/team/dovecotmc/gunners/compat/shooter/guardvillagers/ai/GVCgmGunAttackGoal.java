@@ -6,6 +6,7 @@ import tallestegg.guardvillagers.GuardEntityType;
 import tallestegg.guardvillagers.configuration.GuardConfig;
 import tallestegg.guardvillagers.entities.Guard;
 import team.dovecotmc.gunners.compat.ai.CgmGunAttackGoal;
+import team.dovecotmc.gunners.compat.CompatHandler;
 
 public class GVCgmGunAttackGoal extends CgmGunAttackGoal<Guard> {
     public GVCgmGunAttackGoal(Guard shooter, double stopRange) {
@@ -14,12 +15,13 @@ public class GVCgmGunAttackGoal extends CgmGunAttackGoal<Guard> {
 
     @Override
     protected int consumeAmmo() {
-        return weapon.consumeAmmoFromVoid();
+        return CompatHandler.getInstance().finiteReserveAmmo
+                ? weapon.consumeAmmoInInv(shooter.guardInventory) : weapon.consumeAmmoFromVoid();
     }
 
     @Override
     protected boolean canLoad() {
-        return true;
+        return !CompatHandler.getInstance().finiteReserveAmmo || weapon.hasAmmoInInv(shooter.guardInventory);
     }
 
     @Override

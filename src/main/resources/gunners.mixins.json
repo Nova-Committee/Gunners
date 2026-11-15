@@ -7,12 +7,16 @@
   "plugin": "team.dovecotmc.gunners.mixin.plugin.GunnersMixinPlugin",
   "mixins": [
     "common.guardvillagers.MixinGuard",
-    "common.recruits.MixinCrossBowmanEntity"
+    "common.recruits.MixinCrossBowmanEntity",
+    "common.tacz.MixinLivingEntityAmmoCheck",
+    "common.sbw.MixinInventoryTool"
   ],
   "client": [
     "client.guardvillagers.MixinGuardRenderer",
     "client.recruits.MixinRecruitHumanRenderer",
-    "client.recruits.MixinRecruitVillagerRenderer"
+    "client.recruits.MixinRecruitVillagerRenderer",
+    "client.MixinGunItemInHandLayer",
+    "client.pointblank.MixinGunItemRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
