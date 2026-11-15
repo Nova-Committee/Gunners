@@ -141,14 +141,15 @@ public final class PointBlankGunAttackGoal extends Goal {
         SoundEvent sound = gun.getFireSound();
         if (sound != null) shooter.playSound(sound, gun.getFireSoundVolume(), 1.0F);
         int pellets = mode.getPelletCount() > 0 ? mode.getPelletCount() : gun.getPelletCount();
+        // Point Blank discards the projectile argument after impact. Hitscan shots have no projectile entity.
         if (pellets <= 1) {
-            gun.hurtEntity(shooter, entityHit, shooter, held);
+            gun.hurtEntity(shooter, entityHit, null, held);
         } else {
             double spread = mode.getPelletSpread() >= 0 ? mode.getPelletSpread() : gun.getPelletSpread();
             for (HitResult pellet : HitScan.getObjectsInCrosshair(shooter, start, direction, 0, range,
                     pellets, spread, shooter.getRandom().nextLong(), block -> false, block -> false, null)) {
                 if (pellet instanceof EntityHitResult pelletHit && pelletHit.getEntity() == target && target.isAlive()) {
-                    gun.hurtEntity(shooter, pelletHit, shooter, held);
+                    gun.hurtEntity(shooter, pelletHit, null, held);
                 }
             }
         }
